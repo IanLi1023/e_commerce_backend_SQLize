@@ -3,13 +3,15 @@ const { Tag, Product, ProductTag } = require('../../models');
 
 // The `/api/tags` endpoint
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   // find all tags
   // be sure to include its associated Product data
   try {
-    const tags = Tag.findAll(
+    const tags = await Tag.findAll(
       {
-        include: [{ model: Product }],
+        include: [
+          { model: Product }
+        ],
       }
     );
 
@@ -19,11 +21,13 @@ router.get('/', (req, res) => {
   }
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find a single tag by its `id`
   // be sure to include its associated Product data
   try {
-    const tag = Tag.findByPk({
+    const tag = await Tag.findByPk(
+      req.params.id,
+      {
       include: [{ model: Product }],
     });
     res.json(tag);
@@ -32,45 +36,37 @@ router.get('/:id', (req, res) => {
   }
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   // create a new tag
-  const { tag_name } = req.body;
   try {
-    const newTag = Tag.create(
-      {
-        tag_name
-      });
+    const newTag = await Tag.create(req.body);
     res.json(newTag);
   } catch (e) {
     res.json(e);
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   // update a tag's name by its `id` value
-  const { tag_name } = req.body;
   try {
-    Tag.update(
-      {
-        tag_name
-      },
+    await Tag.update(req.body,
       {
         where: {
           id: req.params.id
         }
       });
-    const updatedTag = Tag.findByPk(req.params.id);
+    const updatedTag = await Tag.findByPk(req.params.id);
     res.json(updatedTag)
   } catch (e) {
     res.json(e);
   }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete on tag by its `id` 
   try {
-    const deletedTag = Tag.findByPk(req.params.id)
-    Tag.destroy({
+    const deletedTag = await Tag.findByPk(req.params.id)
+    await Tag.destroy({
       where: {
         id: req.params.id,
       }

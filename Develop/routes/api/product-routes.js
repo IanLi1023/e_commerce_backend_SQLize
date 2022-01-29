@@ -3,23 +3,25 @@ const {
   Product,
   Category,
   Tag,
-  ProductTag
+
 } = require('../../models');
 
 // The `/api/products` endpoint
 
 // get all products
-router.get('/', (req, res) => {
-  // find all products
-  // be sure to include its associated Category and Tag data
+router.get('/', async (req, res) => {
+  // find all categories
+  // be sure to include its associated Products
   try {
-    const products = Product.findAll({
-      include: [
-        { model: Product },
-        { model: Tag },
-      ]
-    },
-    )
+    const products = await Product.findAll(
+      {
+        include: [
+          { model: Category },
+          { model: Tag }
+        ],
+      }
+    );
+
     res.json(products);
   } catch (e) {
     res.json(e);
@@ -27,16 +29,18 @@ router.get('/', (req, res) => {
 });
 
 // get one product
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   // find a single product by its `id`
   // be sure to include its associated Category and Tag data
   try {
-    const product = Product.findByPk({
-      include: [
-        { model: Product },
-        { model: Tag },
-      ]
-    },
+    const product = await Product.findByPk(
+      req.params.id,
+      {
+        include: [
+          { model: Category },
+          { model: Tag },
+        ]
+      },
     )
     res.json(product);
   } catch (e) {
@@ -54,16 +58,6 @@ router.post('/', (req, res) => {
       tagIds: [1, 2, 3, 4]
     }
   */
-  const { product_id } = req.body;
-  try {
-    const newProduct = Product.create(
-      {
-        product_id
-      });
-    res.json(newProduct);
-  } catch (e) {
-    res.json(e);
-  }
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
@@ -143,10 +137,10 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
   try {
-    const deletedProduct = Product.findByPk(req.params.id)
+    const deletedProduct = await Product.findByPk(req.params.id)
     Product.destroy({
       where: {
         id: req.params.id,
