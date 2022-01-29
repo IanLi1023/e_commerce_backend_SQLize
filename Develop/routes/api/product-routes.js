@@ -8,6 +8,7 @@ const {
 
 // The `/api/products` endpoint
 
+
 // get all products
 router.get('/', async (req, res) => {
   // find all categories
