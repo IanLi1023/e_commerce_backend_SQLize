@@ -47,9 +47,10 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   // update a category by its `id` value
   try {
-    Category.update(
+    await Category.update(
       {
-        category_name
+        category_name: req.body.category_name,
+        
       },
       {
         where: {
@@ -57,6 +58,7 @@ router.put('/:id', async (req, res) => {
         }
       });
     const updatedCategory = await Category.findByPk(req.params.id);
+    console.log('Updated Category',updatedCategory)
     res.json(updatedCategory)
   } catch (e) {
     res.json(e);
